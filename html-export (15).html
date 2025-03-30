@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Girish Lade Chatbot</title>
+  <style>
+    /* Body and layout styling */
+    body {
+      background-color: #fdf6e3;
+      color: #333;
+      font-family: "Courier New", Courier, monospace;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    /* Header styling */
+    header {
+      background: #6d4c41;
+      color: #fff;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    /* Chat container styling */
+    #chat-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 1rem auto;
+      background: #fff;
+      border: 2px solid #6d4c41;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    /* Chat area styling */
+    #chat-area {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      background: #f7f1e1;
+    }
+    /* Message styling */
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      position: relative;
+      overflow: visible; /* Ensures copy icon is not clipped */
+    }
+    .userMessage {
+      background-color: #c8e6c9;
+      text-align: right;
+    }
+    .botMessage {
+      background-color: #ffe0b2;
+      text-align: left;
+    }
+    /* Loading animation styling */
+    .loading {
+      text-align: center;
+      font-style: italic;
+      color: #d32f2f;
+      margin-bottom: 1rem;
+    }
+    /* Input container styling */
+    #input-container {
+      display: flex;
+    }
+    #userInput {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #6d4c41;
+      border-right: none;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    #sendBtn {
+      padding: 0.5rem 1rem;
+      border: 1px solid #6d4c41;
+      background-color: #6d4c41;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    /* Copy icon button styling */
+    .copy-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: -45px;  /* Positioned outside the message box */
+      background: #fff;
+      border: 1px solid #6d4c41;
+      border-radius: 50%;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .copy-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #6d4c41;
+      transition: fill 0.3s;
+    }
+    .copy-btn.copied svg {
+      fill: #388e3c;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Girish Lade</h1>
+  </header>
+
+  <div id="chat-container">
+    <div id="chat-area">
+      <!-- Chat messages will appear here -->
+    </div>
+    <div id="input-container">
+      <input type="text" id="userInput" placeholder="Type your message here..." autocomplete="off">
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // Get DOM elements
+    const chatArea = document.getElementById("chat-area");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    // Function to create a copy icon button
+    function createCopyIconButton(messageContent) {
+      const btn = document.createElement("button");
+      btn.className = "copy-btn";
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24">
+          <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14
+                   c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM12 3c.55 0 1 .45 1 1s-.45 1-1
+                   1-1-.45-1-1 .45-1 1-1zm7 16H5V5h2v2h10V5h2v14z"/>
+        </svg>
+      `;
+      btn.addEventListener("click", () => {
+        navigator.clipboard.writeText(messageContent.textContent)
+          .then(() => {
+            btn.classList.add("copied");
+            setTimeout(() => { btn.classList.remove("copied"); }, 2000);
+          })
+          .catch(err => console.error("Copy error:", err));
+      });
+      return btn;
+    }
+
+    // Function to append messages with customized format and copy icon
+    function appendMessage(content, className) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "message " + className;
+
+      // Message content span
+      const messageContent = document.createElement("span");
+      messageContent.innerHTML = content;
+      messageDiv.appendChild(messageContent);
+
+      // Append copy icon button
+      const copyBtn = createCopyIconButton(messageContent);
+      messageDiv.appendChild(copyBtn);
+
+      chatArea.appendChild(messageDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Function to show loading animation
+    function showLoading() {
+      const loadingDiv = document.createElement("div");
+      loadingDiv.className = "loading";
+      loadingDiv.id = "loading";
+      loadingDiv.textContent = "Loading...";
+      chatArea.appendChild(loadingDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Function to remove loading animation
+    function removeLoading() {
+      const loadingDiv = document.getElementById("loading");
+      if (loadingDiv) {
+        chatArea.removeChild(loadingDiv);
+      }
+    }
+
+    // Function to send message to API and handle response
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+      
+      // Display user's message
+      appendMessage(text, "userMessage");
+      userInput.value = "";
+      showLoading();
+
+      // API call using provided API key
+      fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer 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",
+          "HTTP-Referer": "http://your-site.com",
+          "X-Title": "Your Site Name",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "qwen/qwen2.5-vl-72b-instruct:free",
+          messages: [
+            { role: "user", content: text }
+          ]
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        removeLoading();
+        const botReply = (data.choices && data.choices.length > 0)
+          ? data.choices[0].message.content
+          : "Error: Please try again.";
+        appendMessage(botReply, "botMessage");
+      })
+      .catch(error => {
+        removeLoading();
+        console.error("Error:", error);
+        appendMessage("Server error: Please try again.", "botMessage");
+      });
+    }
+
+    // Event listeners for send button and Enter key press
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
