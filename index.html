@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Code Chatbot</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0f0f0f; color:#33ff66;
+    font-family:"Courier New", Courier, monospace;
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; padding:2rem;
+  }
+  h1 { font-size:2rem; margin-bottom:.5rem; text-shadow:0 0 10px #33ff66; }
+  p.sub { color:#999; margin-bottom:2.5rem; }
+  .grid { display:grid; gap:1.5rem; width:min(560px,100%); }
+  a.card {
+    display:block; text-decoration:none; color:#33ff66;
+    border:2px solid #33ff66; border-radius:8px; padding:1.25rem 1.5rem;
+    transition:all .2s ease;
+  }
+  a.card:hover { background:#33ff66; color:#0f0f0f; transform:translateY(-2px); }
+  a.card h2 { font-size:1.15rem; margin-bottom:.4rem; }
+  a.card span { font-size:.85rem; opacity:.8; }
+  footer { margin-top:3rem; color:#666; font-size:.8rem; }
+  footer a { color:#33ff66; }
+</style>
+</head>
+<body>
+  <h1>&gt; RETRO_CODE_CHATBOT</h1>
+  <p class="sub">client-side retro chat interfaces — pick a variant</p>
+  <div class="grid">
+    <a class="card" href="html-export%20(15).html">
+      <h2>[1] Girish Lade Chatbot</h2>
+      <span>warm paper-toned layout, courier typography</span>
+    </a>
+    <a class="card" href="html-export%20(17).html">
+      <h2>[2] Retro Chatbot Interface</h2>
+      <span>alternative retro styling variant</span>
+    </a>
+    <a class="card" href="html-export%20(18).html">
+      <h2>[3] Retro Code Chatbot</h2>
+      <span>code-box rendering + optional API chat (own key needed)</span>
+    </a>
+  </div>
+  <footer>Built by Girish Lade · <a href="https://ladestack.in">ladestack.in</a></footer>
+</body>
+</html>
